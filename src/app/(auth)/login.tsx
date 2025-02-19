@@ -100,7 +100,7 @@ enum LoginStrategy {
         <TouchableOpacity 
           style={styles.loginButton}
           // onPress={handleSignIn}
-          onPress={() => router.replace('/(drawer)/(tabs)')}  
+          onPress={() => router.replace('/(drawer)/(tabs)/media')}  
           disabled={loading}
         >
           <Text style={styles.loginButtonText}>Log in</Text>
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
   input: {
     height: 50,
     borderWidth: 1,
-    borderColor: '#E5E5E5',
+    borderColor: '#000',
     borderRadius: 8,
     paddingHorizontal: 16,
     fontSize: 16,
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
   passwordContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderColor: 'gray',
+    borderColor: '#000',
     borderWidth: 1,
     borderRadius: 5,
     marginBottom: 10,

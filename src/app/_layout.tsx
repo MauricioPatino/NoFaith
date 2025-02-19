@@ -36,21 +36,32 @@ function RootLayoutNav() {
   // }
 
   return (
-    <Stack>
-      <Stack.Screen
-        name="(auth)/login"
-        options={{
-          headerShown: false
-        }}
-      />
-      <Stack.Screen
-        name="(auth)/register"
-        options={{
-          headerShown: false
-        }}
-      />
-      <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
-    </Stack>
+    <Drawer>
+    <Drawer.Screen
+      name="/(drawer)/(tabs)"
+      options={{
+        drawerLabel: "Home",
+        title: "",
+      }}
+    />
+    <Drawer.Screen
+      name="/(drawer)/(tabs)/(feed)/profile"
+      options={{
+        drawerLabel: "Shop",
+        title: "Shop",
+      }}
+    />  
+    </Drawer>
+    /* <Drawer.Screen
+      name="settings"
+      options={{
+        drawerLabel: "Settings",
+        title: "Settings",
+      }}
+    /> */
+
+    // <Stack screenOptions={{ headerShown: false }}>
+    //   <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
+    // </Stack>
   );
 }

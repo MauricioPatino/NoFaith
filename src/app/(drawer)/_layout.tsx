@@ -6,6 +6,7 @@ import { Feather, Ionicons } from "@expo/vector-icons";
 import { router, usePathname } from "expo-router";
 import { useNavigation } from "@react-navigation/native";
 import { DrawerActions } from "@react-navigation/native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const CustomDrawerContent = (props: any) => {
   const pathname = usePathname();
@@ -48,28 +49,29 @@ export default function Layout() {
   const navigation = useNavigation();
 
   return (
-    <Drawer
-      drawerContent={(props) => <CustomDrawerContent {...props} />}
-      screenOptions={{
-        headerLeft: () => (
-          <TouchableOpacity
-            onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}
-            style={{ marginLeft: 16 }}
-          >
-            <Ionicons name="menu" size={24} color="black" />
-          </TouchableOpacity>
-        ),
-        headerShown: true, // Show the header so the menu button is visible
-        drawerStyle: {
-          backgroundColor: "#fff",
-          width: 200,
-        },
-        swipeEnabled: true,
-        drawerType: "front",
-      }}
-    >
+    // <Drawer
+    //   drawerContent={(props) => <CustomDrawerContent {...props} />}
+    //   screenOptions={{
+    //     headerLeft: () => (
+    //       <TouchableOpacity
+    //         onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}
+    //         style={{ marginLeft: 16 }}
+    //       >
+    //         <Ionicons name="menu" size={24} color="black" />
+    //       </TouchableOpacity>
+    //     ),
+    //     headerShown: true, // Show the header so the menu button is visible
+    //     drawerStyle: {
+    //       backgroundColor: "#fff",
+    //       width: 200,
+    //     },
+    //     swipeEnabled: true,
+    //     drawerType: "front",
+    //   }}
+    // >
+    <Drawer drawerContent={(props) => <CustomDrawerContent {...props} />} screenOptions={{headerShown: false}}>
       <Drawer.Screen
-        name="(tabs)"
+        name="/(drawer)/(tabs)"
         options={{
           headerShown: false,
           drawerLabel: "Home",
