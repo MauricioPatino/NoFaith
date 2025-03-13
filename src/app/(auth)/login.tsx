@@ -39,7 +39,7 @@ enum LoginStrategy {
   
       if (createdSessionId) {
         setActive?.({ session: createdSessionId }); 
-        router.replace('/(drawer)/(tabs)/media');
+        router.replace('/home/tabs');
       }
     } catch (err) {
       console.error('OAuth error', err);
@@ -55,7 +55,7 @@ enum LoginStrategy {
         password,
       });
       await setActive({ session: completeSignIn.createdSessionId });
-      router.replace('/(drawer)/(tabs)/media');
+      router.replace('/home/tabs');
     } catch (err: any) {
       console.error(err);
       alert(err.errors?.[0]?.message || "An error occurred");
@@ -100,7 +100,7 @@ enum LoginStrategy {
         <TouchableOpacity 
           style={styles.loginButton}
           // onPress={handleSignIn}
-          onPress={() => router.replace('/(drawer)/(tabs)/media')}  
+          onPress={() => router.replace('/home/tabs')}  
           disabled={loading}
         >
           <Text style={styles.loginButtonText}>Log in</Text>
@@ -120,7 +120,7 @@ enum LoginStrategy {
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>Don't have an account? </Text>
-          <TouchableOpacity onPress={() => router.push('/register')}>
+          <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
             <Text style={styles.signUpText}>Sign up</Text>
           </TouchableOpacity>
         </View>

@@ -1,11 +1,15 @@
-import { Button, View, Text } from 'react-native';
-import React, { useMemo, useState } from 'react';
-import { Link, Redirect, router, Stack } from 'expo-router';
+// app/index.tsx
+import { useAuth } from "@clerk/clerk-expo";
+import { Redirect } from "expo-router";
 
-const Page = () => {
-  return (
-    <Redirect href="/(auth)/login" />
-  );
-};
 
-export default Page;
+export default function Index() {
+  const { isSignedIn } = useAuth();
+
+  // If somehow the user is already signed in, redirect them.
+  if (isSignedIn) {
+    return <Redirect href="/home/tabs" />;
+  } else {
+    return <Redirect href="/(auth)/login" />;
+  }
+}
