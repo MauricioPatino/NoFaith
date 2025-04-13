@@ -30,7 +30,7 @@ export default function Register() {
       });
 
       await setActive({ session: completeSignUp.createdSessionId });
-      router.replace('/home/tabs');
+      // router.replace('/home/tabs');
     } catch (err: any) {
       console.error(err);
       if (err.errors?.[0]?.message?.includes("data breach")) {

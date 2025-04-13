@@ -6,7 +6,7 @@ export default function HomeTabsLayout() {
     <Tabs screenOptions={{ headerShown: false }}>
       <Tabs.Screen name="index"         
       options={{
-          tabBarLabel: "Home",
+          tabBarLabel: "Topics",
           tabBarIcon: ({ size, color }) => (
             <MaterialCommunityIcons name="heart-outline" size={size} color={color} />
           ),
