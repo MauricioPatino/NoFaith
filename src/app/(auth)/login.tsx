@@ -1,11 +1,12 @@
 import { Text, View, TextInput, TouchableOpacity, StyleSheet } from "react-native";
-import { useSignIn, useOAuth } from "@clerk/clerk-expo";
+import { useSignIn, useOAuth, useSSO } from "@clerk/clerk-expo";
 import { useState } from "react";
 import { useWarmUpBrowser } from "../../hooks/useWarmUpBrowser";
 import { Ionicons } from '@expo/vector-icons';
 import { router } from "expo-router";
+import { supabase } from "@/src/utils/supabase";
+
 export default function LoginScreen() {
-  //useWarmUpBrowser();
   
   const { signIn, isLoaded, setActive } = useSignIn();
   const [email, setEmail] = useState("");
@@ -13,12 +14,12 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-const { startOAuthFlow: googleAuth } = useOAuth({ strategy: 'oauth_google' });
-const { startOAuthFlow: appleAuth } = useOAuth({ strategy: 'oauth_apple' });
+  const { startSSOFlow: googleAuth } = useSSO();
+  const { startSSOFlow: appleAuth } = useSSO();
 
 enum LoginStrategy {
-  Google = 'oauthGoogle',
-  Apple = 'oauthApple',
+  Google = 'oauth_google',
+  Apple = 'oauth_apple',
 }
 
   const AUTH_STRATEGIES = {
@@ -35,30 +36,52 @@ enum LoginStrategy {
     }
   
     try {
-      const { createdSessionId, setActive } = await selectedAuth();
+      const { createdSessionId, setActive } = await selectedAuth({ strategy: strategy });
   
       if (createdSessionId) {
-        setActive?.({ session: createdSessionId }); 
+        await setActive?.({ session: createdSessionId });
         router.replace('/home/tabs');
       }
     } catch (err) {
       console.error('OAuth error', err);
     }
   };
+  
 
   const handleSignIn = async () => {
-    if (!isLoaded) return;
+    if (!email || !password) {
+      alert("Please enter both email and password");
+      return;
+    }
+    
     setLoading(true);
     try {
-      const completeSignIn = await signIn.create({
-        identifier: email,
-        password,
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
       });
-      await setActive({ session: completeSignIn.createdSessionId });
-      router.replace('/home/tabs');
+
+      if (error) throw error;
+
+      if (data.user) {
+        // Check if user has completed profile setup
+        const { data: userProfile } = await supabase
+          .from('users')
+          .select('username, name')
+          .eq('id', data.user.id)
+          .single();
+
+        if (userProfile && userProfile.username && userProfile.name) {
+          // Profile is complete, go to main app
+          router.replace('/home/tabs');
+        } else {
+          // Profile incomplete, go to profile setup
+          router.replace('/(auth)/profile');
+        }
+      }
     } catch (err: any) {
       console.error(err);
-      alert(err.errors?.[0]?.message || "An error occurred");
+      alert(err.message || "An error occurred during sign in");
     } finally {
       setLoading(false);
     }
@@ -99,14 +122,15 @@ enum LoginStrategy {
 
         <TouchableOpacity 
           style={styles.loginButton}
-          // onPress={handleSignIn}
-          onPress={() => router.replace('/home/tabs')}  
+          onPress={handleSignIn}
           disabled={loading}
         >
-          <Text style={styles.loginButtonText}>Log in</Text>
+          <Text style={styles.loginButtonText}>
+            {loading ? "Signing in..." : "Log in"}
+          </Text>
         </TouchableOpacity>
 
-        <Text style={styles.orText}>or</Text>
+        {/* <Text style={styles.orText}>or</Text>
 
         <View style={styles.socialButtons}>
           <TouchableOpacity style={styles.socialButton} onPress={() => onSelectAuth(LoginStrategy.Google)}>
@@ -116,7 +140,7 @@ enum LoginStrategy {
           <TouchableOpacity style={styles.socialButton} onPress={() => onSelectAuth(LoginStrategy.Apple)}>
             <Ionicons name="logo-apple" size={24} color="#000" style={styles.btnIcon} />
           </TouchableOpacity>
-        </View>
+        </View> */}
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>Don't have an account? </Text>

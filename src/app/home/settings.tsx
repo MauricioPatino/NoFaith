@@ -16,10 +16,8 @@ export default function SettingsScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.header}>Settings</Text>
-      
       {/* Account Settings */}
-      <TouchableOpacity style={styles.item} onPress={() => router.push('/')}>
+      <TouchableOpacity style={styles.item} onPress={() => router.push('/home/Account')}>
         <Text style={styles.itemText}>Account Settings</Text>
       </TouchableOpacity>
 

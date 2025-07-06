@@ -1,11 +1,9 @@
 import { Text, View, TouchableOpacity, TextInput, StyleSheet } from "react-native";
-import { useSignUp } from "@clerk/clerk-expo";
 import { useState } from "react";
 import { router } from "expo-router";
+import { supabase } from "@/src/utils/supabase";
 
 export default function Register() {
-  const { signUp, isLoaded, setActive } = useSignUp();
-  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -15,7 +13,7 @@ export default function Register() {
   const [passwordError, setPasswordError] = useState("");
 
   const handleSignUp = async () => {
-    if (!isLoaded) return;
+    if (!password || !email) return;
     
     if (password !== confirmPassword) {
       alert("Passwords do not match");
@@ -24,20 +22,25 @@ export default function Register() {
 
     setLoading(true);
     try {
-      const completeSignUp = await signUp.create({
-        emailAddress: email,
-        password,
+      // Sign up with Supabase Auth - the trigger will handle user creation
+      const { data, error } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          emailRedirectTo: 'nofaith://verify-email'
+        }
       });
 
-      await setActive({ session: completeSignUp.createdSessionId });
-      // router.replace('/home/tabs');
+      if (error) throw error;
+
+      if (data.user) {
+        // The trigger automatically created the user profile
+        // Navigate to profile setup to complete the profile
+        router.replace('/(auth)/profile');
+      }
     } catch (err: any) {
       console.error(err);
-      if (err.errors?.[0]?.message?.includes("data breach")) {
-        alert("This password has been found in a data breach. Please choose a different, unique password to ensure your account's security.");
-      } else {
-        alert(err.errors?.[0]?.message || "An error occurred");
-      }
+      alert(err.message || "An error occurred");
     } finally {
       setLoading(false);
     }
