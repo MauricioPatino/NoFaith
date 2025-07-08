@@ -156,15 +156,11 @@ export default function AccountSettingsScreen() {
               }
 
               // Delete user from auth
-              const { error: authError } = await supabase.auth.admin.deleteUser(userId!);
-              
-              if (authError) {
-                // If admin delete fails, try user-initiated deletion
-                const { error: userDeleteError } = await supabase.auth.admin.deleteUser(userId!);
-                if (userDeleteError) {
-                  throw new Error('Failed to delete account');
-                }
-              }
+              await fetch('https://uewapnderlqxwayqoxyo.functions.supabase.co/delete-user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: userId }),
+              });
 
               Alert.alert('Account Deleted', 'Your account has been successfully deleted.');
               router.replace('/(auth)/login');

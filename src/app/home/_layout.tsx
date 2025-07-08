@@ -1,15 +1,39 @@
+import { supabase } from "@/src/utils/supabase";
 import { Feather } from "@expo/vector-icons";
 import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
 import { router } from "expo-router";
 import { Drawer } from "expo-router/drawer";
+import { useState, useEffect } from "react";
 import { View, StyleSheet, Text } from "react-native";
+
 const CustomDrawerContent = (props: any) => {
+  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        // Fetch profile from your users table
+        const { data: profile } = await supabase
+          .from('users')
+          .select('name')
+          .eq('id', user.id)
+          .single();
+        setUser({
+          name: profile?.name || "No Name",
+          email: user.email || "No Email",
+        });
+      }
+    };
+    fetchUser();
+  }, []);
+
   return (
     <DrawerContentScrollView {...props}>
       <View style={styles.userInfoWrapper}>
         <View style={styles.userDetailsWrapper}>
-          <Text style={styles.userName}>John Doe</Text>
-          <Text style={styles.userEmail}>john@email.com</Text>
+          <Text style={styles.userName}>{user?.name || "Loading..."}</Text>
+          <Text style={styles.userEmail}>{user?.email || ""}</Text>
         </View>
       </View>
       <DrawerItem
@@ -51,6 +75,7 @@ const CustomDrawerContent = (props: any) => {
     </DrawerContentScrollView>
   );
 };
+
 export default function HomeLayout() {
   return (
     <Drawer drawerContent={(props) => <CustomDrawerContent {...props} />} screenOptions={{headerShown: true}}>
