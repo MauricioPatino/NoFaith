@@ -10,6 +10,7 @@ web-build/
 expo-env.d.ts
 .env
 utils/supabase.ts
+supabase/
 
 # Native
 *.orig.*

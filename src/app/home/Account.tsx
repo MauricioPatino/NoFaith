@@ -155,18 +155,27 @@ export default function AccountSettingsScreen() {
                 console.error('Profile deletion error:', profileError);
               }
 
-              // Delete user from auth
-              await fetch('https://uewapnderlqxwayqoxyo.functions.supabase.co/delete-user', {
+              // Call Edge Function with proper error handling
+              console.log('Calling Edge Function with userId:', userId);
+              const response = await fetch('https://uewapnderlqxwayqoxyo.functions.supabase.co/delete-user', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ user_id: userId }),
               });
 
+              console.log('Response status:', response.status);
+              const result = await response.json();
+              console.log('Response body:', result);
+
+              if (!response.ok) {
+                throw new Error(result.error || `HTTP ${response.status}: Failed to delete account`);
+              }
+
               Alert.alert('Account Deleted', 'Your account has been successfully deleted.');
               router.replace('/(auth)/login');
             } catch (error: any) {
               console.error('Account deletion error:', error);
-              Alert.alert('Error', 'Failed to delete account. Please try again.');
+              Alert.alert('Error', `Failed to delete account: ${error.message}`);
             } finally {
               setDeleting(false);
             }

@@ -156,7 +156,7 @@ enum LoginStrategy {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#F5F5F5', // Light grey background
     padding: 20,
   },
   header: {
@@ -167,30 +167,36 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: 'bold',
+    color: '#B8860B', // Darker gold color for title
   },
   form: {
     gap: 16,
   },
   input: {
     height: 50,
-    borderWidth: 1,
-    borderColor: '#000',
+    borderWidth: 2,
+    borderColor: '#B8860B', // Darker gold border
     borderRadius: 8,
     paddingHorizontal: 16,
     fontSize: 16,
+    backgroundColor: '#FFFFFF', // White background for inputs
+    color: '#000000', // Black text
   },
   passwordContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderColor: '#000',
-    borderWidth: 1,
-    borderRadius: 5,
+    borderColor: '#B8860B', // Darker gold border
+    borderWidth: 2,
+    borderRadius: 8,
     marginBottom: 10,
+    backgroundColor: '#FFFFFF', // White background
   },
   passwordInput: {
     flex: 1,
-    height: 40,
-    padding: 10,
+    height: 50,
+    padding: 16,
+    color: '#000000', // Black text
+    fontSize: 16,
   },
   eyeButton: {
     padding: 10,
@@ -200,20 +206,25 @@ const styles = StyleSheet.create({
   },
   loginButton: {
     height: 50,
-    backgroundColor: '#4285F4',
+    backgroundColor: '#B8860B', // Darker gold background
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 8,
+    shadowColor: '#B8860B',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
   loginButtonText: {
-    color: '#fff',
+    color: '#FFFFFF', // White text on darker gold button
     fontSize: 16,
     fontWeight: '600',
   },
   orText: {
     textAlign: 'center',
-    color: '#666',
+    color: '#B8860B', // Darker gold text
     marginVertical: 16,
   },
   socialButtons: {
@@ -222,11 +233,11 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   socialButton: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#000',
+    backgroundColor: '#FFFFFF', // White background
+    borderWidth: 2,
+    borderColor: '#B8860B', // Darker gold border
     height: 50,
-    borderRadius: 4,
+    borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
@@ -238,10 +249,10 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   footerText: {
-    color: '#666',
+    color: '#666666', // Dark gray text
   },
   signUpText: {
-    color: '#4285F4',
+    color: '#B8860B', // Darker gold color for sign up link
     fontWeight: '600',
   },
 }); 
