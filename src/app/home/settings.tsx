@@ -22,7 +22,7 @@ export default function SettingsScreen() {
       </TouchableOpacity>
 
       {/* Notification Settings */}
-      <TouchableOpacity style={styles.item} onPress={() => router.push('/')}>
+      <TouchableOpacity style={styles.item}>
         <Text style={styles.itemText}>Notification Settings</Text>
       </TouchableOpacity>
 
@@ -33,7 +33,7 @@ export default function SettingsScreen() {
       </View>
 
       {/* About & Help */}
-      <TouchableOpacity style={styles.item} onPress={() => router.push('/')}>
+      <TouchableOpacity style={styles.item} >
         <Text style={styles.itemText}>About & Help</Text>
       </TouchableOpacity>
 

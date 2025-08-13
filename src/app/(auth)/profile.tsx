@@ -11,6 +11,8 @@ import {
 import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { supabase } from '@/src/utils/supabase';
+import { decode } from 'base64-arraybuffer';
+import * as FileSystem from 'expo-file-system';
 
 export default function ProfileSetupScreen() {
   const router = useRouter();
@@ -55,43 +57,62 @@ export default function ProfileSetupScreen() {
 
     try {
       let publicUrl: string | null = null;
+      // Upload new image if selected
       if (avatarUri) {
+        console.log('Starting image upload for user:', userId);
         const fileExt = avatarUri.split('.').pop();
-        const fileName = `${userId}.${fileExt}`;
+        const fileName = `${userId}/avatar.${fileExt}`;
         
-        const response = await fetch(avatarUri);
-        const blob = await response.blob();
+        console.log('File name:', fileName);
         
-        const { error: uploadError } = await supabase.storage
+        // Read the file as base64
+        const base64 = await FileSystem.readAsStringAsync(avatarUri, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        
+        console.log('Base64 data length:', base64.length);
+        
+        // Convert base64 to ArrayBuffer using the decode function
+        const arrayBuffer = decode(base64);
+        
+        console.log('ArrayBuffer size:', arrayBuffer.byteLength);
+        
+        const { data: uploadData, error: uploadError } = await supabase.storage
           .from('avatars')
-          .upload(fileName, blob, {
+          .upload(fileName, arrayBuffer, {
+            contentType: `image/${fileExt}`,
             upsert: true
           });
         
         if (uploadError) {
-          console.warn('Avatar upload error', uploadError.message);
-        } else {
-          const { data } = supabase.storage.from('avatars').getPublicUrl(fileName);
-          publicUrl = data.publicUrl;
+          console.error('Upload error details:', uploadError);
+          throw new Error(`Failed to upload image: ${uploadError.message}`);
         }
+        
+        console.log('Upload successful:', uploadData);
+        const { data } = supabase.storage.from('avatars').getPublicUrl(fileName);
+        publicUrl = data.publicUrl;
+        console.log('Public URL:', publicUrl);
       }
 
-      const { data: userData, error: userError } = await supabase
+      const { error: updateError } = await supabase
         .from('users')
         .update({
-          username,
-          name,
-          bio: bio || '',
+          username: username.trim(),
+          name: name.trim(),
+          bio: bio.trim(),
           image: publicUrl || '',
           updated_at: new Date().toISOString(),
         })
         .eq('id', userId);
 
-      if (userError) {
-        throw new Error(`Profile update failed: ${userError.message}`);
+      console.log('Database update - image URL saved:', publicUrl || '');
+
+      if (updateError) {
+        throw new Error(`Profile update failed: ${updateError.message}`);
       }
 
-      Alert.alert('Success', 'Profile created successfully!');
+      Alert.alert('Success', 'Profile updated successfully!');
       router.replace('/home/tabs');
     } catch (error: any) {
       console.error('Profile setup error:', error);
@@ -104,13 +125,23 @@ export default function ProfileSetupScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Set Up Profile</Text>
-      <TouchableOpacity onPress={pickImage} style={styles.avatarPlaceholder}>
-        {avatarUri ? (
-          <Image source={{ uri: avatarUri }} style={styles.avatarImage} />
-        ) : (
-          <Text>Select Avatar</Text>
-        )}
-      </TouchableOpacity>
+      {/* Profile Image Section */}
+      <View style={styles.imageSection}>
+        <TouchableOpacity onPress={pickImage} style={styles.avatarContainer}>
+          {avatarUri ? (
+            <Image 
+              source={{ uri: avatarUri }} 
+              style={styles.avatarImage}
+              onLoad={() => console.log('Image loaded successfully')}
+              onError={(error) => console.log('Image load error:', error)}
+            />
+          ) : (
+            <View style={styles.avatarPlaceholder}>
+              <Text style={styles.avatarPlaceholderText}>Add Photo</Text>
+            </View>
+          )}
+        </TouchableOpacity>
+      </View>
       <TextInput
         style={styles.input}
         placeholder="Username"
@@ -155,6 +186,20 @@ export default function ProfileSetupScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
+  imageSection: {
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  avatarContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    borderWidth: 1,
+    borderColor: 'gray',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   avatarPlaceholder: {
     width: 100,
     height: 100,
@@ -163,7 +208,10 @@ const styles = StyleSheet.create({
     borderColor: 'gray',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+  },
+  avatarPlaceholderText: {
+    color: 'gray',
+    fontSize: 16,
   },
   avatarImage: { width: 100, height: 100, borderRadius: 50 },
   input: { width: '100%', height: 40, borderColor: 'gray', borderWidth: 1, borderRadius: 5, marginBottom: 12, paddingHorizontal: 10 },

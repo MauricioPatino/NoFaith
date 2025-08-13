@@ -13,6 +13,8 @@ import {
 import { router, useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { supabase } from '@/src/utils/supabase';
+import { decode } from 'base64-arraybuffer';
+import * as FileSystem from 'expo-file-system';
 
 export default function AccountSettingsScreen() {
   const router = useRouter();
@@ -86,24 +88,40 @@ export default function AccountSettingsScreen() {
 
       // Upload new image if selected
       if (avatarUri) {
+        console.log('Starting image upload for user:', userId);
         const fileExt = avatarUri.split('.').pop();
-        const fileName = `${userId}.${fileExt}`;
+        const fileName = `${userId}/avatar.${fileExt}`;
         
-        const response = await fetch(avatarUri);
-        const blob = await response.blob();
+        console.log('File name:', fileName);
         
-        const { error: uploadError } = await supabase.storage
+        // Read the file as base64
+        const base64 = await FileSystem.readAsStringAsync(avatarUri, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        
+        console.log('Base64 data length:', base64.length);
+        
+        // Convert base64 to ArrayBuffer using the decode function
+        const arrayBuffer = decode(base64);
+        
+        console.log('ArrayBuffer size:', arrayBuffer.byteLength);
+        
+        const { data: uploadData, error: uploadError } = await supabase.storage
           .from('avatars')
-          .upload(fileName, blob, {
+          .upload(fileName, arrayBuffer, {
+            contentType: `image/${fileExt}`,
             upsert: true
           });
         
         if (uploadError) {
-          console.warn('Avatar upload error', uploadError.message);
-        } else {
-          const { data } = supabase.storage.from('avatars').getPublicUrl(fileName);
-          publicUrl = data.publicUrl;
+          console.error('Upload error details:', uploadError);
+          throw new Error(`Failed to upload image: ${uploadError.message}`);
         }
+        
+        console.log('Upload successful:', uploadData);
+        const { data } = supabase.storage.from('avatars').getPublicUrl(fileName);
+        publicUrl = data.publicUrl;
+        console.log('Public URL generated:', publicUrl);
       }
 
       // Update user profile

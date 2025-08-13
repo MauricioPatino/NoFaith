@@ -6,16 +6,16 @@ export default function HomeTabsLayout() {
     <Tabs screenOptions={{ headerShown: false }}>
       <Tabs.Screen name="index"         
       options={{
-          tabBarLabel: "Topics",
+          tabBarLabel: "Feed",
           tabBarIcon: ({ size, color }) => (
             <MaterialCommunityIcons name="heart-outline" size={size} color={color} />
           ),
         }} />
       <Tabs.Screen name="media"         
       options={{
-          tabBarLabel: "Media",
+          tabBarLabel: "Profile",
           tabBarIcon: ({ size, color }) => (
-            <MaterialCommunityIcons name="image-multiple-outline" size={size} color={color} />
+            <MaterialCommunityIcons name="account-outline" size={size} color={color} />
           ),
         }} />
     </Tabs>
